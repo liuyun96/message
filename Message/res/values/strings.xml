@@ -4,5 +4,8 @@
     <string name="app_name">Message</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
-
+    
+    <string name="msg">短信内容</string>
+    <string name="sender">短信发送人</string>
+    
 </resources>

