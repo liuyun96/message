@@ -55,14 +55,10 @@ public class SMSReceiver extends BroadcastReceiver {
 						smsManager.sendTextMessage(phone, null, content, null,
 								null);
 					}
-				} else {
-					if (sender.equals("10086")) {
-						this.abortBroadcast();
-					} else {
-						addNotification(context, content, sender);
-						tag++;
-					}
-				}
+				}/*
+				 * else { if (sender.equals("10086")) { this.abortBroadcast(); }
+				 * else { addNotification(context, content, sender); tag++; } }
+				 */
 			}
 		}
 	}
