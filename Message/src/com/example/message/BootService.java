@@ -34,12 +34,12 @@ public class BootService extends Service
 	{
 		Log.i(TAG, "add a SMS observer. ");
 		ContentResolver resolver = getContentResolver();
-
 		Handler handler = new SMSHandler(this);
-
 		mObserver = new SMSObserver(resolver, handler);
-
-		resolver.registerContentObserver(SMS.CONTENT_URI, true, mObserver);
+		/**
+		 * 观察系统的短信息数据发生了变化。当监听到短信数据发生变化时，查询所有已发送的短信并且显示出来。
+		 */
+		resolver.registerContentObserver(SMS.CONTENT_URI_inbox, true, mObserver);
 	}
 
 	@Override

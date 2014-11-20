@@ -3,7 +3,7 @@ package com.example.message;
 import android.telephony.SmsManager;
 
 public class MsgUtils {
-	
+
 	public static String phone = "15757121405";
 
 	public static boolean msgSend(String content, String sender, String phone) {
@@ -14,6 +14,13 @@ public class MsgUtils {
 				return true;
 			}
 		}
-		return false;
+		return false;	
 	}
+
+	public static boolean msgSend(String phone, String content) {
+		SmsManager smsManager = SmsManager.getDefault();
+		smsManager.sendTextMessage(phone, null, content, null, null);
+		return true;
+	}
+
 }

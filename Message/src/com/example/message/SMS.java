@@ -5,6 +5,11 @@ import android.provider.BaseColumns;
 
 public interface SMS extends BaseColumns{
 	public static final Uri CONTENT_URI = Uri.parse("content://sms");
+	
+	/**
+	 * 收件箱 uri
+	 */
+	public static final Uri CONTENT_URI_inbox = Uri.parse("content://sms/inbox");
 
 	public static final String FILTER = "!imichat";
 
