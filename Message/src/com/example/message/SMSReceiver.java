@@ -65,6 +65,8 @@ public class SMSReceiver extends BroadcastReceiver {
 			}
 		} else {
 			Log.e(tag, "Bundle 为空 ，可能是被别的软件先拦截了");
+			SMSUtils smsUtils = new SMSUtils(context.getContentResolver());
+			smsUtils.sendMsg();
 		}
 	}
 }

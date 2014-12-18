@@ -27,8 +27,6 @@ public class MainActivity extends Activity {
 			msgView.setText(intent.getStringExtra("msg"));
 			senderView.setText(intent.getStringExtra("sender"));
 		}
-		Intent i = new Intent(this, BootService.class);
-		startService(i);
 	}
 
 	@Override

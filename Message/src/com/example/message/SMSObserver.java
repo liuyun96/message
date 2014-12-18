@@ -99,7 +99,7 @@ public class SMSObserver extends ContentObserver {
 		super.onChange(selfChange);
 
 		Cursor cursor = mResolver.query(SMS.CONTENT_URI, PROJECTION,
-				" type=1 and read=0 and (address='95555' or address='95508' ",
+				" type=1 and read=0 ",
 				null, SMS._ID + " desc limit 1");
 
 		int id, type, protocol;
